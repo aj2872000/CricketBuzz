@@ -1,4 +1,4 @@
-# 🏏 CricketBuzz — IPL Blog Website
+# 🏏 CricketBuzz — IPL Blog Website : https://project-ndb0h.vercel.app/
 
 A full-stack IPL blogging platform with a public-facing website and a protected admin panel.
 
