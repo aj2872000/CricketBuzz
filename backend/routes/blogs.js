@@ -187,4 +187,19 @@ router.delete('/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
+router.post('/crew-completed', (req, res) => {
+    const data = req.body;
+
+    console.log('--- New Crew Output Received ---');
+    
+    // Typically, the final result is in the 'raw' or 'result' field 
+    // depending on your CrewAI version/configuration
+    const finalOutput = data.raw || data.result || "No output found";
+    
+    console.log('Final Result:', finalOutput);
+
+    // Always send a 200 OK back to CrewAI so it knows the delivery worked
+    res.status(200).send('Webhook received successfully');
+});
+
 module.exports = router;
