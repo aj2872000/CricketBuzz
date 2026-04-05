@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';
+import 'react-quill/dist/quill.snow.css';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -137,9 +138,15 @@ export default function BlogDetailPage() {
 
                 {/* Content */}
                 <div
-                  className="blog-content"
-                  dangerouslySetInnerHTML={{ __html: blog.content }}
-                />
+                  className="blog-content ql-snow"
+                  style={{ border: 'none' }}
+                >
+                  <div
+                    className="ql-editor"
+                    style={{ padding: 0 }}
+                    dangerouslySetInnerHTML={{ __html: blog.content }}
+                  />
+                </div>
 
                 {/* Bottom nav */}
                 <div className="mt-12 pt-8 border-t border-ipl-border flex items-center justify-between">
