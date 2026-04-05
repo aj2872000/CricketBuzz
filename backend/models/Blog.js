@@ -38,7 +38,7 @@ const blogSchema = new mongoose.Schema(
     },
     published: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     views: {
       type: Number,

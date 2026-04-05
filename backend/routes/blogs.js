@@ -78,7 +78,7 @@ router.get('/admin/all', authMiddleware, async (req, res, next) => {
 router.get('/:slug', async (req, res, next) => {
   try {
     const blog = await Blog.findOneAndUpdate(
-      { slug: req.params.slug, published: true },
+      { slug: req.params.slug },
       { $inc: { views: 1 } },
       { new: true }
     );
@@ -187,32 +187,41 @@ router.delete('/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-router.post('/crew-completed', (req, res) => {
-    const data = req.body;
+router.post('/crew-completed', async (req, res) => {
+  const data = req.body;
 
-    const {state, result} = data;
+  const { kickoff_id, result } = data;
 
-    if(state === 'SUCCESS') {
-        console.log('Crew completed successfully with result:', result);
-        const parsedResult = JSON.parse(result);
-        console.log('Parsed Result:', parsedResult);
-        const { title, content, id } = parsedResult;
-          console.log(`New blog generated - ID: ${id}, Title: ${title}, Content: ${content}`);
+  try {
+    if (!kickoff_id || !result) {
+      console.error('Invalid webhook payload:', data);
+      return res.status(400).json({ success: false, message: 'Invalid payload' });
+    }
 
-    } else if(state === 'FAILED') {
-        console.error('Crew failed with result:', result);
-    } 
+    const { id, title, content } = result || {};
 
-    console.log('--- New Crew Output Received ---', data);
-    
-    // Typically, the final result is in the 'raw' or 'result' field 
-    // depending on your CrewAI version/configuration
-    const finalOutput = data.raw || data.result || "No output found";
-    
-    console.log('Final Result:', finalOutput);
+    if (!id || !title || !content) {
+      console.error('Missing expected result fields:', result);
+      return res.status(400).json({ success: false, message: 'Missing result fields' });
+    }
 
-    // Always send a 200 OK back to CrewAI so it knows the delivery worked
-    res.status(200).send('Webhook received successfully');
+    const newBlog = new Blog({
+      title,
+      content,
+      author: 'CrewAI',
+      tags: ['automated'],
+      excerpt: content.substring(0, 150) + '...',
+      coverImage: '',
+      published: false,
+    });
+
+    await newBlog.save();
+
+    res.status(200).json({ success: true, message: 'Blog created successfully', data: newBlog });
+  } catch (error) {
+    console.error('Error processing CrewAI webhook:', error);
+    next(error);
+  }
 });
 
 module.exports = router;
