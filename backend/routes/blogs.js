@@ -197,8 +197,10 @@ router.post('/crew-completed', async (req, res) => {
       console.error('Invalid webhook payload:', data);
       return res.status(400).json({ success: false, message: 'Invalid payload' });
     }
-
-    const { id, title, content } = result || {};
+    
+    const parsedResult = typeof result === 'string' ? JSON.parse(result) : result;
+    
+    const { id, title, content } = parsedResult || {};
 
     if (!id || !title || !content) {
       console.error('Missing expected result fields:', result);
