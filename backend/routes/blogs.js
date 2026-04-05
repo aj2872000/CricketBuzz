@@ -190,7 +190,20 @@ router.delete('/:id', authMiddleware, async (req, res, next) => {
 router.post('/crew-completed', (req, res) => {
     const data = req.body;
 
-    console.log('--- New Crew Output Received ---');
+    const {state, result} = data;
+
+    if(state === 'SUCCESS') {
+        console.log('Crew completed successfully with result:', result);
+        const parsedResult = JSON.parse(result);
+        console.log('Parsed Result:', parsedResult);
+        const { title, content, id } = parsedResult;
+          console.log(`New blog generated - ID: ${id}, Title: ${title}, Content: ${content}`);
+
+    } else if(state === 'FAILED') {
+        console.error('Crew failed with result:', result);
+    } 
+
+    console.log('--- New Crew Output Received ---', data);
     
     // Typically, the final result is in the 'raw' or 'result' field 
     // depending on your CrewAI version/configuration
