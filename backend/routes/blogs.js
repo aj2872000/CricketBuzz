@@ -119,7 +119,9 @@ router.post(
         content,
         author,
         tags: tags || [],
-        excerpt,
+        // Only use provided excerpt if it's plain text; otherwise let the
+        // pre('save') hook strip HTML from content and generate it
+        excerpt: excerpt && !excerpt.includes('<') ? excerpt : undefined,
         coverImage,
         published: published !== undefined ? published : true,
       });
@@ -157,6 +159,12 @@ router.put(
       fields.forEach((field) => {
         if (req.body[field] !== undefined) blog[field] = req.body[field];
       });
+
+      // If excerpt is empty or contains raw HTML tags, clear it so
+      // the pre('save') hook regenerates a clean plain-text excerpt
+      if (!blog.excerpt || blog.excerpt.includes('<')) {
+        blog.excerpt = undefined;
+      }
 
       await blog.save();
       res.json({ success: true, message: 'Blog updated successfully', data: blog });

@@ -50,8 +50,23 @@ const blogSchema = new mongoose.Schema(
   }
 );
 
-// Auto-generate slug from title before saving
+// Strip HTML tags and decode entities to get plain text
+function htmlToPlainText(html) {
+  return html
+    .replace(/<[^>]+>/g, ' ')   // remove all HTML tags
+    .replace(/&nbsp;/g, ' ')    // decode HTML entities
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')       // collapse whitespace
+    .trim();
+}
+
+// Auto-generate slug and excerpt before saving
 blogSchema.pre('save', async function (next) {
+  // Slug generation
   if (this.isModified('title') || this.isNew) {
     let baseSlug = slugify(this.title, {
       lower: true,
@@ -59,7 +74,6 @@ blogSchema.pre('save', async function (next) {
       trim: true,
     });
 
-    // Check for duplicate slugs
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -73,10 +87,12 @@ blogSchema.pre('save', async function (next) {
     this.slug = slug;
   }
 
-  // Auto-generate excerpt from content if not provided
-  if (!this.excerpt && this.content) {
-    const plainText = this.content.replace(/<[^>]+>/g, '');
-    this.excerpt = plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
+  // Excerpt generation — always strip HTML, never store raw tags
+  if (this.content && (this.isModified('content') || !this.excerpt)) {
+    if (!this.excerpt || this.excerpt.includes('<')) {
+      const plain = htmlToPlainText(this.content);
+      this.excerpt = plain.substring(0, 200) + (plain.length > 200 ? '...' : '');
+    }
   }
 
   next();
