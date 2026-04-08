@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,76 +17,76 @@ export default function HomePage() {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentPage = parseInt(searchParams.get('page') || '1');
-  const currentTag = searchParams.get('tag') || '';
+  const currentPage   = parseInt(searchParams.get('page')   || '1');
+  const currentTag    = searchParams.get('tag')    || '';
   const currentSearch = searchParams.get('search') || '';
   const [searchInput, setSearchInput] = useState(currentSearch);
 
   const fetchBlogs = useCallback(async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
       const params = { page: currentPage, limit: 9 };
-      if (currentTag) params.tag = currentTag;
+      if (currentTag)    params.tag    = currentTag;
       if (currentSearch) params.search = currentSearch;
       const { data } = await api.get('/blogs', { params });
       setBlogs(data.data);
       setPagination(data.pagination);
-    } catch (err) {
+    } catch {
       setError('Failed to load articles. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, [currentPage, currentTag, currentSearch]);
 
   useEffect(() => { fetchBlogs(); }, [fetchBlogs]);
 
-  const handlePageChange = (page) => {
-    setSearchParams((prev) => { prev.set('page', page); return prev; });
+  const handlePageChange = page => {
+    setSearchParams(prev => { prev.set('page', page); return prev; });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const handleTagClick = (tag) => {
-    setSearchParams({ tag: tag === currentTag ? '' : tag, page: '1' });
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearchParams({ search: searchInput, page: '1' });
-  };
+  const handleTagClick = tag => setSearchParams({ tag: tag === currentTag ? '' : tag, page: '1' });
+  const handleSearch   = e  => { e.preventDefault(); setSearchParams({ search: searchInput, page: '1' }); };
 
   return (
     <>
       <Helmet>
         <title>CricketBuzz — IPL News, Analysis & Match Reports</title>
-        <meta name="description" content="Your ultimate destination for IPL cricket news, match analysis, player insights, and team updates. Stay ahead with CricketBuzz." />
-        <meta property="og:title" content="CricketBuzz — IPL News & Analysis" />
-        <meta property="og:description" content="Latest IPL cricket news, match reports, and expert analysis." />
+        <meta name="description" content="Your ultimate destination for IPL cricket news, match analysis, player insights, and team updates." />
       </Helmet>
 
-      <div className="min-h-screen bg-ipl-dark">
+      <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
         <Navbar />
 
         {/* Hero */}
         <section className="relative pt-28 pb-16 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-10 left-1/4 w-96 h-96 bg-ipl-orange/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-ipl-gold/5 rounded-full blur-3xl" />
+            <div className="absolute top-10 left-1/4 w-96 h-96 rounded-full blur-3xl"
+              style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)' }} />
+            <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-3xl"
+              style={{ background: 'color-mix(in srgb, var(--gold) 6%, transparent)' }} />
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-ipl-orange/10 border border-ipl-orange/20 mb-5">
-                <span className="w-1.5 h-1.5 rounded-full bg-ipl-orange animate-pulse" />
-                <span className="text-ipl-orange text-xs font-heading font-semibold tracking-widest uppercase">Live Season Coverage</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5"
+                style={{ background: 'color-mix(in srgb, var(--orange) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--orange) 25%, transparent)' }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--orange)' }} />
+                <span className="text-xs font-heading font-semibold tracking-widest uppercase" style={{ color: 'var(--orange)' }}>
+                  Live Season Coverage
+                </span>
               </div>
-              <h1 className="font-display text-6xl sm:text-8xl text-white mb-4 leading-none tracking-wide">
+              <h1 className="font-display text-6xl sm:text-8xl mb-4 leading-none tracking-wide" style={{ color: 'var(--text)' }}>
                 <span className="gradient-text">CRICKET</span>
                 <br />
-                <span className="text-white">BUZZ</span>
+                <span>BUZZ</span>
               </h1>
-              <p className="text-gray-400 text-lg font-body leading-relaxed max-w-lg">
+              <p className="text-lg font-body leading-relaxed max-w-lg" style={{ color: 'var(--text-muted)' }}>
                 Deep dives, match reports, player analyses, and everything IPL. Written by fans, for fans.
               </p>
+              <div className="mt-6 flex gap-3">
+                <Link to="/write"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-heading font-bold text-sm tracking-wider text-white transition-opacity hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg, var(--orange), var(--gold))' }}>
+                  ✍️ Write an Article
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -94,42 +94,37 @@ export default function HomePage() {
         {/* Search + Filters */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
           <form onSubmit={handleSearch} className="flex gap-3 mb-6">
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+            <input type="text" value={searchInput} onChange={e => setSearchInput(e.target.value)}
               placeholder="Search articles..."
-              className="flex-1 bg-ipl-card border border-ipl-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-ipl-orange transition-colors font-body text-sm"
+              className="flex-1 rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-all"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text)' }}
+              onFocus={e => e.target.style.borderColor = 'var(--orange)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border)'}
             />
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-ipl-orange text-black font-heading font-bold text-sm tracking-wider rounded-lg hover:bg-amber-500 transition-colors"
-            >
+            <button type="submit"
+              className="px-6 py-2.5 font-heading font-bold text-sm tracking-wider rounded-lg text-white transition-opacity hover:opacity-90"
+              style={{ background: 'var(--orange)' }}>
               SEARCH
             </button>
             {(currentSearch || currentTag) && (
-              <button
-                type="button"
-                onClick={() => { setSearchInput(''); setSearchParams({}); }}
-                className="px-4 py-2.5 border border-ipl-border text-gray-400 hover:text-white rounded-lg transition-colors text-sm"
-              >
+              <button type="button" onClick={() => { setSearchInput(''); setSearchParams({}); }}
+                className="px-4 py-2.5 rounded-lg text-sm transition-all"
+                style={{ border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
                 Clear
               </button>
             )}
           </form>
 
-          {/* Team tags */}
+          {/* Team tag filters */}
           <div className="flex flex-wrap gap-2">
-            {IPL_TEAMS.map((team) => (
-              <button
-                key={team}
-                onClick={() => handleTagClick(team)}
-                className={`px-3 py-1 rounded-md font-heading font-semibold text-xs tracking-widest uppercase transition-all ${
-                  currentTag === team
-                    ? 'bg-ipl-orange text-black shadow-md shadow-orange-500/30'
-                    : 'bg-ipl-card border border-ipl-border text-gray-400 hover:border-ipl-orange/50 hover:text-ipl-orange'
-                }`}
-              >
+            {IPL_TEAMS.map(team => (
+              <button key={team} onClick={() => handleTagClick(team)}
+                className="px-3 py-1 rounded-md font-heading font-semibold text-xs tracking-widest uppercase transition-all"
+                style={currentTag === team
+                  ? { background: 'var(--orange)', color: '#fff', boxShadow: '0 2px 8px color-mix(in srgb, var(--orange) 30%, transparent)' }
+                  : { background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+                onMouseEnter={e => { if (currentTag !== team) { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)'; } }}
+                onMouseLeave={e => { if (currentTag !== team) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; } }}>
                 {team}
               </button>
             ))}
@@ -138,16 +133,17 @@ export default function HomePage() {
 
         {/* Blog Grid */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          {/* Stats bar */}
           {!loading && !error && (
             <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm" style={{ color: 'var(--text-sub)' }}>
                 {currentSearch || currentTag
                   ? `${pagination.total} result${pagination.total !== 1 ? 's' : ''} found`
                   : `${pagination.total} article${pagination.total !== 1 ? 's' : ''} published`}
               </p>
               {pagination.totalPages > 1 && (
-                <p className="text-gray-500 text-sm">Page {pagination.page} of {pagination.totalPages}</p>
+                <p className="text-sm" style={{ color: 'var(--text-sub)' }}>
+                  Page {pagination.page} of {pagination.totalPages}
+                </p>
               )}
             </div>
           )}
@@ -155,11 +151,10 @@ export default function HomePage() {
           {error && (
             <div className="text-center py-20">
               <div className="text-4xl mb-4">🏏</div>
-              <p className="text-gray-400 mb-4">{error}</p>
-              <button
-                onClick={fetchBlogs}
-                className="px-6 py-2 bg-ipl-orange text-black font-heading font-bold rounded-lg hover:bg-amber-500 transition-colors"
-              >
+              <p className="mb-4" style={{ color: 'var(--text-muted)' }}>{error}</p>
+              <button onClick={fetchBlogs}
+                className="px-6 py-2 font-heading font-bold rounded-lg text-white"
+                style={{ background: 'var(--orange)' }}>
                 Retry
               </button>
             </div>
@@ -176,8 +171,8 @@ export default function HomePage() {
               {!loading && blogs.length === 0 && (
                 <div className="text-center py-24">
                   <div className="text-6xl mb-4">🏏</div>
-                  <h3 className="font-heading text-2xl text-white mb-2">No Articles Found</h3>
-                  <p className="text-gray-500">Try a different search or filter.</p>
+                  <h3 className="font-heading text-2xl mb-2" style={{ color: 'var(--text)' }}>No Articles Found</h3>
+                  <p style={{ color: 'var(--text-sub)' }}>Try a different search or filter.</p>
                 </div>
               )}
 
