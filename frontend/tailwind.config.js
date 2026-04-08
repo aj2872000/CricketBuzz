@@ -6,28 +6,41 @@ module.exports = {
       fontFamily: {
         display: ['"Bebas Neue"', 'cursive'],
         heading: ['"Barlow Condensed"', 'sans-serif'],
-        body: ['"DM Sans"', 'sans-serif'],
+        body:    ['"DM Sans"', 'sans-serif'],
       },
       colors: {
-        ipl: {
-          gold: '#F4C430',
-          orange: '#FF6B00',
-          blue: '#003D7D',
-          dark: '#0A0A0F',
-          card: '#13131A',
-          border: '#1E1E2E',
-          muted: '#6B7280',
+        // Static brand colours (always the same)
+        'ipl-orange': '#FF6B00',
+        'ipl-gold':   '#F4C430',
+        // Theme-aware via CSS vars — use as bg-theme, text-theme, etc.
+        theme: {
+          bg:     'var(--bg)',
+          card:   'var(--bg-card)',
+          input:  'var(--bg-input)',
+          border: 'var(--border)',
+          text:   'var(--text)',
+          muted:  'var(--text-muted)',
+          sub:    'var(--text-sub)',
+          accent: 'var(--orange)',
         },
       },
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.4s ease-out',
-        shimmer: 'shimmer 1.5s infinite',
+      borderColor: {
+        theme: 'var(--border)',
       },
-      keyframes: {
-        fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
-        slideUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
-        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+      backgroundColor: {
+        theme: {
+          DEFAULT: 'var(--bg)',
+          card:    'var(--bg-card)',
+          input:   'var(--bg-input)',
+        },
+      },
+      textColor: {
+        theme: {
+          DEFAULT: 'var(--text)',
+          muted:   'var(--text-muted)',
+          sub:     'var(--text-sub)',
+          accent:  'var(--orange)',
+        },
       },
     },
   },

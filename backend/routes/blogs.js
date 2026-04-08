@@ -74,6 +74,20 @@ router.get('/admin/all', authMiddleware, async (req, res, next) => {
   }
 });
 
+
+// GET /api/blogs/preview/:slug — Public preview for drafts (no view count increment)
+router.get('/preview/:slug', async (req, res, next) => {
+  try {
+    const blog = await Blog.findOne({ slug: req.params.slug });
+    if (!blog) {
+      return res.status(404).json({ success: false, message: 'Blog not found' });
+    }
+    res.json({ success: true, data: blog });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/blogs/:slug — Public
 router.get('/:slug', async (req, res, next) => {
   try {
