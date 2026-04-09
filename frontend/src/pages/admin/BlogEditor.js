@@ -6,7 +6,6 @@ import 'react-quill/dist/quill.snow.css';
 import { format } from 'date-fns';
 import api from '../../utils/api';
 import AdminSidebar from '../../components/AdminSidebar';
-import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const IPL_TAGS = [
